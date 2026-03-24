@@ -1,0 +1,6 @@
+# task.md
+
+- [ ] Implementing 15-second timeout in Backlog Report Generator
+  - [/] Investigate data fetching mechanism in [Backlog_Report.html](file:///d:/1.Projects/Results/BacklogReport%201/Backlog_Report.html)
+  - [ ] Implement a 15-second timeout for the API request
+  - [ ] Display an appropriate error message to the user if the request times out after 15 seconds

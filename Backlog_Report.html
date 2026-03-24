@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEC Backlog Report Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a237e;
+            --primary-light: #3949ab;
+            --primary-dark: #0d1642;
+            --success: #2e7d32;
+            --danger: #c62828;
+            --warning: #f57f17;
+            --accent: #ff6f00;
+            --bg: #f0f2f5;
+            --card-bg: #fff;
+            --text: #1a1a2e;
+            --text-muted: #888;
+            --border: #e0e0e0;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary), var(--primary-light));
+            color: white;
+            padding: 24px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.07) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .college-name {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .college-sub {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .report-title {
+            font-size: 18px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.15);
+            display: inline-block;
+            padding: 6px 22px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .report-meta {
+            margin-top: 8px;
+            font-size: 12px;
+            opacity: 0.75;
+        }
+
+        .top-bar-container {
+            max-width: 1800px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+
+        .top-bar {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 16px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-input {
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            outline: none;
+            width: 140px;
+            background: #fafafa;
+            transition: all 0.2s;
+        }
+
+        .filter-input:focus {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+        }
+
+        .action-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 9px 16px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 38px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-light);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: var(--bg);
+            border-color: #bbb;
+        }
+
+        .divider {
+            width: 1px;
+            height: 30px;
+            background: var(--border);
+            margin: 0 4px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
+        .progress-container {
+            max-width: 1800px;
+            margin: 0 auto 12px;
+            padding: 0 16px;
+        }
+
+        .progress-bar-bg {
+            background: #e0e0e0;
+            border-radius: 8px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
+            transition: width 0.4s;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            max-width: 1800px;
+            margin: 0 auto 16px;
+            padding: 0 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 14px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 3px solid var(--primary);
+        }
+
+        .stat-card.green {
+            border-top-color: var(--success);
+        }
+
+        .stat-card.red {
+            border-top-color: var(--danger);
+        }
+
+        .stat-card.orange {
+            border-top-color: var(--accent);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        .stat-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Table */
+        .table-container {
+            max-width: 1800px;
+            margin: 0 auto 30px;
+            padding: 0 16px;
+        }
+
+        .table-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            max-height: 80vh;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        /* Semester group headers */
+        .sem-group-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            text-align: center;
+            font-weight: 700;
+            font-size: 12px;
+            padding: 8px 6px;
+            letter-spacing: 0.5px;
+            border-right: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .sem-group-header:last-child {
+            border-right: none;
+        }
+
+        .info-header {
+            background: #37474f !important;
+        }
+
+        thead tr:nth-child(2) th {
+            background: #f5f6fa;
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 6px;
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 34px;
+            z-index: 9;
+        }
+
+        thead tr:first-child th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 7px 8px;
+            border-bottom: 1px solid #f0f0f0;
+            border-right: 1px solid #f5f5f5;
+        }
+
+        tr:hover {
+            background: #f5f7ff;
+        }
+
+        tr:nth-child(even) {
+            background: #fafbfc;
+        }
+
+        tr:nth-child(even):hover {
+            background: #f0f1ff;
+        }
+
+        .backlog-cell {
+            color: var(--danger);
+            font-weight: 700;
+            font-size: 10px;
+        }
+
+        .clear-cell {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .sgpa-cell {
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .sgpa-high {
+            color: var(--success);
+        }
+
+        .sgpa-low {
+            color: var(--accent);
+        }
+
+        .empty-cell {
+            color: #ccc;
+            text-align: center;
+        }
+
+        .nptel-cell {
+            font-size: 9px;
+            font-weight: 500;
+            color: #5c6bc0;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .phone-cell {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .name-cell {
+            font-weight: 600;
+            min-width: 150px;
+        }
+
+        .roll-cell {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .lateral-row {
+            background: #fff8e1 !important;
+        }
+
+        .lateral-row:hover {
+            background: #fff3cd !important;
+        }
+
+        .lateral-badge {
+            background: #ff8f00;
+            color: white;
+            font-size: 8px;
+            padding: 1px 5px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        .sem-divider {
+            border-right: 2px solid var(--border) !important;
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s ease infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: white;
+                font-size: 9px;
+            }
+
+            .top-bar-container,
+            .progress-container {
+                display: none !important;
+            }
+
+            .header {
+                padding: 12px;
+            }
+
+            .table-scroll {
+                max-height: none;
+                overflow: visible;
+            }
+
+            .table-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+
+            table {
+                font-size: 8px;
+            }
+
+            td,
+            th {
+                padding: 3px 4px !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <div class="top-bar-container">
+        <div class="top-bar">
+            <div class="input-group" style="align-items: flex-end;">
+                <div class="input-wrapper">
+                    <span class="input-label">Year</span>
+                    <input type="text" id="batchYear" value="24" class="filter-input" style="width: 50px; text-align: center;" />
+                </div>
+                <div class="input-wrapper">
+                    <span class="input-label">Code</span>
+                    <input type="text" id="collegeCode" value="6F" class="filter-input" style="width: 50px; text-align: center;" />
+                </div>
+                <div class="input-wrapper">
+                    <span class="input-label">Branch</span>
+                    <select id="branchSelect" class="filter-input" style="width: 160px; padding: 8px 10px;">
+                        <option value="01">CIVIL (01)</option>
+                        <option value="02">EEE (02)</option>
+                        <option value="04">ECE (04)</option>
+                        <option value="05" selected>CSE (05)</option>
+                        <option value="62">CSE (CS) (62)</option>
+                        <option value="67">CSE (AI & ML) (67)</option>
+                        <option value="74">CSE (DS) (74)</option>
+                    </select>
+                </div>
+                <div class="input-wrapper">
+                    <span class="input-label">Reg End</span>
+                    <input type="text" id="regEnd" value="C8" class="filter-input" title="Suffix for Last Regular Student (e.g. C8)" style="width: 60px; text-align: center;" />
+                </div>
+                <div class="input-wrapper">
+                    <span class="input-label">LE End</span>
+                    <input type="text" id="leEnd" value="12" class="filter-input" title="Suffix for Last LE Student (e.g. 12)" style="width: 60px; text-align: center;" />
+                </div>
+                <button class="btn btn-primary" id="fetchBtn" onclick="startFetchProcess()" style="margin-left: 4px;">🚀 Fetch Data</button>
+            </div>
+
+            <div class="action-group">
+                <button class="btn btn-outline" onclick="resetFilter()">🔄 Reset UI</button>
+                <div class="divider"></div>
+                <button class="btn btn-outline" onclick="toggleOnlyBacklogs()">🔍 Show Backlogs Only</button>
+                <div class="divider"></div>
+                <button class="btn btn-success" id="exportBtn" onclick="exportCSV()" disabled>📥 Export CSV</button>
+                <button class="btn btn-accent" onclick="window.print()">🖨️ Print</button>
+            </div>
+        </div>
+        <div style="text-align: right; margin-top: 8px; padding-right: 4px;">
+            <span id="statusBadge" style="font-size:12px;font-weight:600;color:var(--text-muted);"></span>
+        </div>
+    </div>
+
+    <div class="progress-container" id="progressContainer" style="display:none;">
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+        </div>
+        <div class="progress-text" id="progressText"></div>
+    </div>
+
+    <div class="dashboard" id="dashboard" style="display:none;"></div>
+
+    <div class="table-container">
+        <div class="table-card">
+            <div class="table-scroll">
+                <table id="reportTable">
+                    <thead></thead>
+                    <tbody id="reportBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://api.campx.in/exams/student-results/external';
+        const HEADERS = { 'x-institution-code': 'pec', 'x-tenant-id': 'pec', 'x-api-version': '2' };
+
+        // Subject code → short name mapping
+        const SUBJECT_SHORT_NAMES = {
+            // Semester 1 (I-I)
+            'PMA101BS': 'M&C', 'PMA1BS': 'M&C',
+            'PCY102BS': 'EC', 'PCY1BS': 'EC',
+            'PCS103ES': 'PPS', 'PCS1ES': 'PPS',
+            'PEE104ES': 'BEE', 'PEE1ES': 'BEE',
+            'PME105ES': 'CAEG', 'PME1ES': 'CAEG',
+            'PCS103PC': 'PPS',
+            // Semester 2 (I-II)
+            'PMA201BS': 'ODEVC', 'PMA2BS': 'ODEVC',
+            'PPH202BS': 'AP', 'PPH2BS': 'AP',
+            'PEC203ES': 'EDC', 'PEC2ES': 'EDC',
+            'PCS204ES': 'AP', 'PCS2ES': 'AP',
+            // Semester 3 (II-I)
+            'PCS301PC': 'DE',
+            'PCS302PC': 'DS',
+            'PCS303PC': 'COSM',
+            'PCS304PC': 'COA',
+            'PCS305PC': 'JAVA',
+            'PCS306PC': 'DS Lab',
+            'PCS307PC': 'JAVA Lab',
+            'PCS308PC': 'Power BI',
+            'PMC310': 'GS',
+            // Semester 4 (II-II)
+            'PCS401PC': 'OS',
+            'PCS402PC': 'DBMS',
+            'PCS403PC': 'DAA',
+            'PCS404PC': 'SE',
+            'PCS405PC': 'CN',
+            'PCS406PC': 'DBMS Lab',
+            'PCS407PC': 'OS Lab',
+            // Semester 5 (III-I)
+            'PCS501PC': 'AI',
+            'PCS502PC': 'CD',
+            'PCS503PC': 'ML',
+            // Semester 6 (III-II)
+            'PCS601PC': 'CC',
+            'PCS602PC': 'CNS',
+        };
+
+        // Convert subject code/name to short form
+        function getShortName(subjectCode, subjectName) {
+            if (SUBJECT_SHORT_NAMES[subjectCode]) return SUBJECT_SHORT_NAMES[subjectCode];
+            if (subjectName) {
+                const name = subjectName.trim();
+                const isLab = /laboratory/i.test(name);
+                const cleanName = name.replace(/\s*laboratory\s*/i, '').replace(/\s*lab\s*/i, '').trim();
+                const nameMap = {
+                    'mathematics': 'M&C', 'calculus': 'M&C',
+                    'chemistry': 'EC', 'engineering chemistry': 'EC',
+                    'programming for problem solving': 'PPS', 'problem solving': 'PPS',
+                    'electrical': 'BEE', 'basic electrical': 'BEE',
+                    'engineering graphics': 'CAEG', 'computer aided': 'CAEG',
+                    'differential equations': 'ODEVC', 'vector calculus': 'ODEVC',
+                    'applied physics': 'AP', 'physics': 'AP',
+                    'electronic devices': 'EDC',
+                    'digital electronics': 'DE',
+                    'data structures': 'DS',
+                    'statistical methods': 'COSM', 'computer oriented statistical': 'COSM',
+                    'computer organization': 'COA',
+                    'java': 'JAVA', 'object oriented programming': 'JAVA',
+                    'operating system': 'OS',
+                    'database': 'DBMS', 'dbms': 'DBMS',
+                    'design and analysis': 'DAA', 'algorithm': 'DAA',
+                    'software engineering': 'SE',
+                    'computer networks': 'CN',
+                    'artificial intelligence': 'AI',
+                    'compiler design': 'CD',
+                    'machine learning': 'ML',
+                    'cloud computing': 'CC',
+                    'cryptography': 'CNS', 'network security': 'CNS',
+                    'gender sensitization': 'GS',
+                    'power bi': 'Power BI',
+                };
+                const lower = cleanName.toLowerCase();
+                for (const [key, val] of Object.entries(nameMap)) {
+                    if (lower.includes(key)) return isLab ? val + ' Lab' : val;
+                }
+                const words = cleanName.split(/\s+/).filter(w => !['and', 'of', 'the', 'for', 'in', 'to', 'a', 'an', 'through', 'with', 'using'].includes(w.toLowerCase()));
+                if (words.length > 1) {
+                    const abbr = words.map(w => w[0].toUpperCase()).join('');
+                    return isLab ? abbr + ' Lab' : abbr;
+                }
+                return isLab ? cleanName.substring(0, 4) + ' Lab' : cleanName.substring(0, 6);
+            }
+            return subjectCode || '?';
+        }
+
+        // Generic empty student data array
+        const students = [];
+
+        let showOnlyBacklogs = false;
+        let currentStudents = students;
+
+        function generateSequence(start, end) {
+            const startStr = start.toUpperCase();
+            const endStr = end.toUpperCase();
+
+            if (startStr.length !== endStr.length || startStr.length < 2) return [startStr, endStr];
+
+            const prefix = startStr.substring(0, startStr.length - 2);
+            const prefixEnd = endStr.substring(0, endStr.length - 2);
+
+            if (prefix !== prefixEnd) return [startStr, endStr];
+
+            let s1 = startStr.charAt(startStr.length - 2), s2 = startStr.charAt(startStr.length - 1);
+            let e1 = endStr.charAt(endStr.length - 2), e2 = endStr.charAt(endStr.length - 1);
+
+            let all = [];
+            // JNTU Sequence: 00 to 99
+            for (let i = 0; i <= 9; i++) {
+                for (let j = 0; j <= 9; j++) {
+                    all.push(i.toString() + j.toString());
+                }
+            }
+            // A0 to Z9
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            for (let c of letters) {
+                for (let j = 0; j <= 9; j++) {
+                    all.push(c + j.toString());
+                }
+            }
+
+            const startIndex = all.indexOf(s1 + s2);
+            const endIndex = all.indexOf(e1 + e2);
+
+            let result = [];
+            if (startIndex !== -1 && endIndex !== -1 && startIndex <= endIndex) {
+                for (let i = startIndex; i <= endIndex; i++) {
+                    result.push(prefix + all[i]);
+                }
+            } else {
+                result = [startStr, endStr];
+            }
+
+            return result;
+        }
+
+        async function startFetchProcess() {
+            const year = document.getElementById('batchYear').value.trim();
+            const cCode = document.getElementById('collegeCode').value.trim().toUpperCase();
+            const branch = document.getElementById('branchSelect').value;
+            const regEnd = document.getElementById('regEnd').value.trim().toUpperCase();
+            const leEnd = document.getElementById('leEnd').value.trim().toUpperCase();
+
+            if (!year || !cCode || !branch || !regEnd || !leEnd) {
+                alert("Please fill in all details (Year, Code, Branch, Reg End, LE End)");
+                return;
+            }
+
+            localStorage.setItem('pecBacklogYear', year);
+            localStorage.setItem('pecBacklogCode', cCode);
+            localStorage.setItem('pecBacklogBranch', branch);
+            localStorage.setItem('pecBacklogRegEnd', regEnd);
+            localStorage.setItem('pecBacklogLEEnd', leEnd);
+
+            const fetchBtn = document.getElementById('fetchBtn');
+            fetchBtn.innerHTML = '<span class="spinner"></span> Generating...';
+            fetchBtn.disabled = true;
+
+            // Generate Regular Rolls
+            const regPrefix = `${year}${cCode}1A${branch}`;
+            const startRoll = `${regPrefix}01`;
+            const endRoll = `${regPrefix}${regEnd}`;
+            
+            // Generate LE Rolls
+            const leYear = (parseInt(year) + 1).toString().padStart(2, '0');
+            const lePrefix = `${leYear}${cCode}5A${branch}`;
+            const leStartRoll = `${lePrefix}01`;
+            const leEndRoll = `${lePrefix}${leEnd}`;
+
+            const regRolls = generateSequence(startRoll, endRoll);
+            const leRolls = generateSequence(leStartRoll, leEndRoll);
+            
+            const rolls = [...regRolls, ...leRolls];
+
+            currentStudents = rolls.map((r, i) => ({
+                sno: i + 1,
+                roll: r,
+                name: "Fetching...",
+                phone: "",
+                mother: "",
+                father: "",
+                nptel: "",
+                lateral: !!r.includes("5A"),
+                sem: {}
+            }));
+
+            renderTable();
+            await fetchAndUpdate();
+        }
+
+        function resetFilter() {
+            document.getElementById('batchYear').value = '24';
+            document.getElementById('collegeCode').value = '6F';
+            document.getElementById('branchSelect').value = '05';
+            document.getElementById('regEnd').value = 'C8';
+            document.getElementById('leEnd').value = '12';
+            localStorage.removeItem('pecBacklogYear');
+            localStorage.removeItem('pecBacklogCode');
+            localStorage.removeItem('pecBacklogBranch');
+            localStorage.removeItem('pecBacklogRegEnd');
+            localStorage.removeItem('pecBacklogLEEnd');
+            currentStudents = students;
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('reportBody');
+            const thead = document.querySelector('#reportTable thead');
+
+            const activeSems = [];
+            for (let sem = 1; sem <= 8; sem++) {
+                let hasData = currentStudents.some(st => st.sem[sem] && (st.sem[sem].b || st.sem[sem].s));
+                if (hasData) activeSems.push(sem);
+            }
+            if (activeSems.length === 0) activeSems.push(1); // Default to generic if empty
+
+            const semNames = {
+                1: 'I-I (Sem 1)', 2: 'I-II (Sem 2)', 3: 'II-I (Sem 3)', 4: 'II-II (Sem 4)',
+                5: 'III-I (Sem 5)', 6: 'III-II (Sem 6)', 7: 'IV-I (Sem 7)', 8: 'IV-II (Sem 8)'
+            };
+            const semColors = {
+                1: 'linear-gradient(135deg,#1b5e20,#2e7d32)',
+                2: 'linear-gradient(135deg,#0d47a1,#1565c0)',
+                3: 'linear-gradient(135deg,#4a148c,#6a1b9a)',
+                4: 'linear-gradient(135deg,#bf360c,#e65100)',
+                5: 'linear-gradient(135deg,#006064,#00838f)',
+                6: 'linear-gradient(135deg,#880e4f,#ad1457)',
+                7: 'linear-gradient(135deg,#33691e,#558b2f)',
+                8: 'linear-gradient(135deg,#263238,#37474f)'
+            };
+
+            let headHtml = `
+                <tr>
+                    <th class="sem-group-header info-header" colspan="2">Student Information</th>
+            `;
+            activeSems.forEach(sem => {
+                headHtml += `<th class="sem-group-header" colspan="2" style="background:${semColors[sem]};">${semNames[sem]}</th>`;
+            });
+            headHtml += `
+                    <th class="sem-group-header" colspan="1" style="background:linear-gradient(135deg,#b71c1c,#e53935);">Summary</th>
+                </tr>
+                <tr>
+                    <th>S.No</th>
+                    <th>HT. No</th>
+            `;
+            activeSems.forEach(() => {
+                headHtml += `<th class="sem-divider">Backlogs</th><th>SGPA</th>`;
+            });
+            headHtml += `
+                    <th>Total</th>
+                </tr>
+            `;
+            thead.innerHTML = headHtml;
+
+            let html = '';
+            let visibleCount = 0;
+            currentStudents.forEach((st, idx) => {
+                const isLateral = st.lateral;
+                const hasAnyBacklog = Object.values(st.sem).some(s => s.b && s.b !== '0');
+                if (showOnlyBacklogs && !hasAnyBacklog) return;
+
+                visibleCount++;
+                const rowClass = isLateral ? 'lateral-row' : '';
+                html += `<tr class="${rowClass}">`;
+                html += `<td>${visibleCount}</td>`;
+                html += `<td class="roll-cell">${st.roll}${isLateral ? '<span class="lateral-badge">LE</span>' : ''}</td>`;
+
+                activeSems.forEach(sem => {
+                    const data = st.sem[sem] || {};
+                    const backlogs = data.b || '';
+                    const sgpa = data.s || '';
+
+                    let bCell, sCell;
+                    if (backlogs === '0') {
+                        bCell = `<td class="sem-divider clear-cell">✅ Clear</td>`;
+                    } else if (backlogs) {
+                        bCell = `<td class="sem-divider backlog-cell">${backlogs}</td>`;
+                    } else {
+                        bCell = `<td class="sem-divider empty-cell">—</td>`;
+                    }
+
+                    if (sgpa) {
+                        const sgpaVal = parseFloat(sgpa);
+                        const sgpaClass = !isNaN(sgpaVal) ? (sgpaVal >= 8 ? 'sgpa-high' : sgpaVal < 6 ? 'sgpa-low' : '') : '';
+                        sCell = `<td class="sgpa-cell ${sgpaClass}">${sgpa}</td>`;
+                    } else {
+                        sCell = `<td class="empty-cell">—</td>`;
+                    }
+                    html += bCell + sCell;
+                });
+
+                // Total backlogs count
+                let totalBacklogs = 0;
+                for (let sem = 1; sem <= 8; sem++) {
+                    const b = st.sem[sem]?.b;
+                    if (b && b !== '0') {
+                        totalBacklogs += b.split(',').length;
+                    }
+                }
+                if (totalBacklogs > 0) {
+                    html += `<td style="text-align:center;font-weight:800;font-size:13px;color:#c62828;background:#ffebee;">${totalBacklogs}</td>`;
+                } else {
+                    html += `<td style="text-align:center;font-weight:700;font-size:12px;color:#2e7d32;background:#e8f5e9;">✅ 0</td>`;
+                }
+                html += '</tr>';
+            });
+            tbody.innerHTML = html;
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            let withBacklogs = 0;
+            let allClear = 0;
+            const semBacklogCount = {};
+            for (let i = 1; i <= 8; i++) semBacklogCount[i] = 0;
+
+            const displayedStudents = showOnlyBacklogs
+                ? currentStudents.filter(st => Object.values(st.sem).some(s => s.b && s.b !== '0'))
+                : currentStudents;
+
+            displayedStudents.forEach(st => {
+                let hasAny = false;
+                for (let sem = 1; sem <= 8; sem++) {
+                    const b = st.sem[sem]?.b;
+                    if (b && b !== '0') {
+                        hasAny = true;
+                        semBacklogCount[sem]++;
+                    }
+                }
+                if (hasAny) withBacklogs++; else allClear++;
+            });
+
+            const total = displayedStudents.length;
+            const dash = document.getElementById('dashboard');
+            dash.style.display = 'grid';
+
+            let dashHtml = `
+                <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total Students</div></div>
+                <div class="stat-card green"><div class="stat-value">${allClear}</div><div class="stat-label">All Clear</div></div>
+                <div class="stat-card red"><div class="stat-value">${withBacklogs}</div><div class="stat-label">Has Backlogs</div></div>
+            `;
+
+            const semLabels = { 1: 'I-I', 2: 'I-II', 3: 'II-I', 4: 'II-II', 5: 'III-I', 6: 'III-II', 7: 'IV-I', 8: 'IV-II' };
+
+            const activeSems = [];
+            for (let sem = 1; sem <= 8; sem++) {
+                if (currentStudents.some(st => st.sem[sem] && (st.sem[sem].b || st.sem[sem].s))) {
+                    activeSems.push(sem);
+                }
+            }
+
+            activeSems.forEach(sem => {
+                dashHtml += `<div class="stat-card"><div class="stat-value">${semBacklogCount[sem]}</div><div class="stat-label">${semLabels[sem]} Backlogs</div></div>`;
+            });
+            dash.innerHTML = dashHtml;
+        }
+
+        function toggleOnlyBacklogs() {
+            showOnlyBacklogs = !showOnlyBacklogs;
+            renderTable();
+            document.getElementById('statusBadge').textContent = showOnlyBacklogs ? '🔍 Showing only students with backlogs' : '';
+        }
+
+        // Fetch from API and update semester data
+        async function fetchAndUpdate() {
+            const fetchBtn = document.getElementById('fetchBtn');
+            fetchBtn.disabled = true;
+            fetchBtn.innerHTML = '<span class="spinner"></span> Fetching...';
+            
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            progressContainer.style.display = 'block';
+
+            const total = currentStudents.length;
+            let completed = 0;
+            let hasError = false;
+            
+            progressBar.style.width = '0%';
+            progressText.style.color = '';
+            progressText.textContent = `Processing 0 of ${total} roll numbers (0%)...`;
+
+            const BATCH_SIZE = 5; // strictly limited to 5 to avoid browser connection blocking/hanging
+
+            for (let i = 0; i < total; i += BATCH_SIZE) {
+                const batch = currentStudents.slice(i, i + BATCH_SIZE);
+                let batchErrors = 0;
+                let batchTimeouts = 0;
+
+                const promises = batch.map(async (st) => {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout to prevent infinite hangs
+                    try {
+                        const resp = await fetch(`${API_BASE}?examType=general&rollNo=${st.roll}`, { 
+                            headers: HEADERS,
+                            signal: controller.signal
+                        });
+                        clearTimeout(timeoutId);
+
+                        if (!resp.ok) {
+                            if (st.name === "Fetching...") st.name = "Not Found";
+                            return;
+                        }
+                        const data = await resp.json();
+                        if (!data || !data.student) {
+                            if (st.name === "Fetching...") st.name = "Not Found";
+                            return;
+                        }
+
+                        if (data.student.fullName && st.name === "Fetching...") {
+                            st.name = data.student.fullName;
+                        }
+
+                        // Update each semester from API
+                        if (data.results) {
+                            data.results.forEach(sem => {
+                                const semNo = sem.semNo;
+                                if (semNo < 1 || semNo > 8) return;
+
+                                const failedSubs = [];
+                                let allPassed = true;
+
+                                if (sem.subjectsResults) {
+                                    sem.subjectsResults.forEach(sub => {
+                                        const g = sub.consideredGrade;
+                                        if (g && !g.passed) {
+                                            allPassed = false;
+                                            // Use short subject name
+                                            const code = sub.subject?.subjectCode || '';
+                                            const name = sub.subject?.name || '';
+                                            failedSubs.push(getShortName(code, name));
+                                        }
+                                    });
+                                }
+
+                                if (!st.sem[semNo]) st.sem[semNo] = {};
+
+                                // Update backlog info from API
+                                if (allPassed) {
+                                    st.sem[semNo].b = '0';
+                                } else {
+                                    st.sem[semNo].b = failedSubs.join(',');
+                                }
+
+                                // Update SGPA
+                                if (sem.sgpa) {
+                                    st.sem[semNo].s = allPassed ? sem.sgpa : '';
+                                }
+                            });
+
+                            // Update CGPA if available
+                            if (data.cgpa) st.cgpa = data.cgpa;
+                        }
+                    } catch (e) {
+                        clearTimeout(timeoutId);
+                        batchErrors++;
+                        if (e.name === 'AbortError') batchTimeouts++;
+                        if (st.name === "Fetching...") st.name = "Not Found";
+                    } finally {
+                        completed++;
+                        const pct = Math.round((completed / total) * 100);
+                        progressBar.style.width = pct + '%';
+                        if (progressText.style.color === '') {
+                            progressText.textContent = `Loaded ${completed} of ${total} roll numbers (${pct}%)`;
+                        }
+                    }
+                });
+
+                await Promise.all(promises);
+                renderTable(); // Update UI table dynamically on every batch
+                
+                if (batchTimeouts > 0) {
+                    alert("Error: The server took too long to respond (>15s). Fetch process has been aborted due to timeout.");
+                    progressText.textContent = "Fetch aborted due to server timeout. Please try again later.";
+                    progressText.style.color = "red";
+                    hasError = true;
+                    break;
+                } else if (batchErrors === batch.length) {
+                    alert("Error: The server is not responding (Network failure). Fetch process has been aborted.");
+                    progressText.textContent = "Fetch aborted due to network error.";
+                    progressText.style.color = "red";
+                    hasError = true;
+                    break;
+                }
+
+                if (i + BATCH_SIZE < total) await new Promise(r => setTimeout(r, 150));
+            }
+
+            // Filter out invalid generated roll numbers
+            currentStudents = currentStudents.filter(st => st.name !== "Not Found" && st.name !== "Fetching...");
+            currentStudents.forEach((st, idx) => st.sno = idx + 1);
+
+            fetchBtn.innerHTML = '🚀 Fetch Data';
+            fetchBtn.disabled = false;
+            
+            if (!hasError) {
+                progressText.textContent = `Completed! ${currentStudents.length} valid students fetched.`;
+            }
+            document.getElementById('exportBtn').disabled = false;
+
+            renderTable();
+        }
+
+        function exportCSV() {
+            const activeSems = [];
+            for (let sem = 1; sem <= 8; sem++) {
+                if (currentStudents.some(st => st.sem[sem] && (st.sem[sem].b || st.sem[sem].s))) {
+                    activeSems.push(sem);
+                }
+            }
+            if (activeSems.length === 0) activeSems.push(1);
+
+            const semNames = { 1: 'I-I', 2: 'I-II', 3: 'II-I', 4: 'II-II', 5: 'III-I', 6: 'III-II', 7: 'IV-I', 8: 'IV-II' };
+
+            let csv = 'S.No,HT.No,Name,Student Ph,Mother Ph,Father Ph,NPTEL';
+            activeSems.forEach(n => { csv += `,${semNames[n]} Backlogs,${semNames[n]} SGPA`; });
+            csv += '\n';
+
+            currentStudents.forEach(st => {
+                csv += `${st.sno},"${st.roll}","${st.name}","${st.phone}","${st.mother}","${st.father}","${st.nptel}"`;
+                activeSems.forEach(sem => {
+                    const d = st.sem[sem] || {};
+                    csv += `,"${d.b || ''}","${d.s || ''}"`;
+                });
+                csv += '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const br = document.getElementById('branchSelect');
+            const branchName = br.options[br.selectedIndex].text.split(' ')[0];
+            a.download = `PEC_${branchName}_Backlog_Report_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Restore saved inputs
+        window.addEventListener('DOMContentLoaded', () => {
+            const y = localStorage.getItem('pecBacklogYear');
+            const c = localStorage.getItem('pecBacklogCode');
+            const b = localStorage.getItem('pecBacklogBranch');
+            const r = localStorage.getItem('pecBacklogRegEnd');
+            const l = localStorage.getItem('pecBacklogLEEnd');
+            if (y) document.getElementById('batchYear').value = y;
+            if (c) document.getElementById('collegeCode').value = c;
+            if (b) document.getElementById('branchSelect').value = b;
+            if (r) document.getElementById('regEnd').value = r;
+            if (l) document.getElementById('leEnd').value = l;
+        });
+
+        // Initial render
+        renderTable();
+    </script>
+
+</body>
+
+</html>
